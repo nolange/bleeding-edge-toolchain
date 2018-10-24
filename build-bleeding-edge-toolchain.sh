@@ -907,6 +907,8 @@ messageA "Package"
 tagFile="${top}/${buildNative}/package_generated"
 if [ ! -f "${tagFile}" ]; then
 	maybeDelete "${package}"
+	# remove dupes, optional so never fail
+	rdfind -makehardlinks true -makeresultsfile false ${installNative} || :
 	ln -s "${installNative}" "${package}"
 	maybeDelete "${packageArchiveNative}"
 	if [ "${uname}" = "Darwin" ]; then
