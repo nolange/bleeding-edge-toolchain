@@ -1,0 +1,47 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+include /usr/share/dpkg/pkg-info.mk
+
+BINPKG = $(DEB_SOURCE)
+PREFIX = /opt/$(BINPKG)-$(DEB_VERSION_UPSTREAM)
+
+# libcpp fails with -Werror=format-security
+export DEB_BUILD_MAINT_OPTIONS=hardening=-format
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+
+override_dh_auto_build:
+	mkdir build
+	cd build && ../build-bleeding-edge-toolchain.sh --skip-documentation
+
+override_dh_auto_clean:
+	-rm -rf build
+	dh_auto_clean
+
+override_dh_auto_install:
+	mkdir -p debian/$(BINPKG)$(PREFIX)
+	cp -ar build/installNative/. debian/$(BINPKG)$(PREFIX)
+	rdfind -makehardlinks true -makeresultsfile false debian/$(BINPKG)$(PREFIX)
+
+
+override_dh_strip override_dh_makeshlibs:
+
+# TODO: remove debendency on libfl2
+# TODO: potentially package gdb separately
+# TODO: python3?
