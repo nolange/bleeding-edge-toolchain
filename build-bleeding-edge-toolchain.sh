@@ -66,7 +66,8 @@ zlibArchive="${zlib}.tar.gz"
 gnuMirror="https://ftpmirror.gnu.org"
 pkgversion="bleeding-edge-toolchain"
 target="arm-none-eabi"
-package="${target}-${gcc}-$(date +'%y%m%d')"
+[ -n "${package_date-}" ] || package_date=$(date +'%y%m%d')
+package="${target}-${gcc}-${package_date}"
 packageArchiveNative="${package}.tar.xz"
 packageArchiveWin32="${package}-win32.7z"
 packageArchiveWin64="${package}-win64.7z"
@@ -147,6 +148,9 @@ BASE_CPPFLAGS="-pipe"
 BASE_LDFLAGS=
 BASE_CFLAGS_FOR_TARGET="-pipe -ffunction-sections -fdata-sections"
 BASE_CXXFLAGS_FOR_TARGET="-pipe -ffunction-sections -fdata-sections -fno-exceptions"
+export ARFLAGS="Dcvr"
+export ARFLAGS_FOR_TARGET="${ARFLAGS-}"
+[ -n "${SOURCE_DATE_EPOCH-}" ] || export SOURCE_DATE_EPOCH=$(date +%s -d "$package_date")
 
 messageA() {
 	echo "${bold}********** ${1}${normal}"
@@ -391,6 +395,7 @@ buildBinutils() {
 			--enable-multilib \
 			--enable-plugins \
 			--with-system-zlib \
+			--enable-deterministic-archives \
 			--with-pkgversion=\"${pkgversion}\""
 		messageB "${bannerPrefix}${binutils} make"
 		make "-j${nproc}"
@@ -907,7 +912,7 @@ if [ ! -f "${tagFile}" ]; then
 	if [ "${uname}" = "Darwin" ]; then
 		XZ_OPT=${XZ_OPT-"-9e -v"} tar -cJf "${packageArchiveNative}" "${package}"/*
 	else
-		XZ_OPT=${XZ_OPT-"-9e -v"} tar -cJf "${packageArchiveNative}" --mtime='@0' --numeric-owner --group=0 --owner=0 "${package}"/*
+		XZ_OPT=${XZ_OPT-"-9e -v"} tar -cJf "${packageArchiveNative}" --mtime='@0' --sort=name --numeric-owner --group=0 --owner=0 "${package}"/*
 	fi
 	maybeDelete "${package}"
 	touch "${tagFile}"
