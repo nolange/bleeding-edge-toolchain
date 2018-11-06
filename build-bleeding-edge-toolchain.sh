@@ -144,8 +144,8 @@ if [ "${quiet}" = "y" ]; then
 	export GNUMAKEFLAGS="--quiet"
 fi
 
-BASE_CPPFLAGS="-pipe"
-BASE_LDFLAGS=
+BASE_CPPFLAGS="-pipe -fno-plt -fno-pie -no-pie"
+BASE_LDFLAGS="-no-pie"
 BASE_CFLAGS_FOR_TARGET="-pipe -ffunction-sections -fdata-sections"
 BASE_CXXFLAGS_FOR_TARGET="-pipe -ffunction-sections -fdata-sections -fno-exceptions"
 export ARFLAGS="Dcvr"
