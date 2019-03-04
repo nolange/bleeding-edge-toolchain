@@ -778,8 +778,13 @@ if [ "${gccVersion#*-}" = "${gccVersion}" ]; then
 else
 	download "${gccArchive}" "https://gcc.gnu.org/pub/gcc/snapshots/${gccVersion}/${gccArchive}"
 fi
-[ "$skipGdb" = "y" ] ||
-	download "${gdbArchive}" "${gnuMirror}/gdb/${gdbArchive}"
+if [ "$skipGdb" = "y" ]; then
+	if [ ${gdbVersion%*\.*\.*\.*} = ${gdbVersion} ]; then
+		download "${gdbArchive}" "${gnuMirror}/gdb/${gdbArchive}"
+	else
+		download "${gdbArchive}" ftp://sourceware.org/pub/gdb/snapshots/branch/${gdbArchive}
+	fi
+fi
 download "${gmpArchive}" "${gnuMirror}/gmp/${gmpArchive}"
 download "${islArchive}" "http://isl.gforge.inria.fr/${islArchive}"
 if [ "${enableWin32}" = "y" ] || [ "${enableWin64}" = "y" ]; then
