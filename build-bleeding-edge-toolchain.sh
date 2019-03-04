@@ -146,8 +146,8 @@ fi
 
 BASE_CPPFLAGS="-pipe -fno-plt -fno-pie -no-pie"
 BASE_LDFLAGS="-no-pie"
-BASE_CFLAGS_FOR_TARGET="-pipe -ffunction-sections -fdata-sections"
-BASE_CXXFLAGS_FOR_TARGET="-pipe -ffunction-sections -fdata-sections -fno-exceptions"
+BASE_CFLAGS_FOR_TARGET="-pipe -ffunction-sections -fdata-sections -fno-semantic-interposition"
+BASE_CXXFLAGS_FOR_TARGET="-pipe -ffunction-sections -fdata-sections -fno-exceptions -fno-semantic-interposition"
 export ARFLAGS="Dcvr"
 export ARFLAGS_FOR_TARGET="${ARFLAGS-}"
 [ -n "${SOURCE_DATE_EPOCH-}" ] || export SOURCE_DATE_EPOCH=$(date +%s -d "$package_date")
