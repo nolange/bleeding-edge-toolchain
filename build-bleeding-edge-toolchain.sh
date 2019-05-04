@@ -401,6 +401,7 @@ buildBinutils() {
 		make "-j${nproc}"
 		messageB "${bannerPrefix}${binutils} make install"
 		make install
+		mkdir -p "${top}/${installFolder}"/lib/bfd-plugins
 		for documentation in ${documentations}; do
 			messageB "${bannerPrefix}${binutils} make install-${documentation}"
 			make "install-${documentation}"
@@ -461,7 +462,14 @@ buildGcc() {
 		messageB "${bannerPrefix}${gcc} make all-gcc"
 		make "-j${nproc}" all-gcc
 		messageB "${bannerPrefix}${gcc} make install-gcc"
-		make install-gcc
+		make install-gcc		
+		cd "${top}/${installFolder}"
+		ltoplugin=$(find lib* -name liblto_plugin.so)
+		if [ -e "$ltoplugin" -a -d lib/bfd-plugins ]; then
+			# remove one directory level if those match
+			[ ${ltoplugin#lib/} != ${ltoplugin} ] && ltoplugin=../${ltoplugin#lib/} || ltoplugin=../../${ltoplugin}
+			ln -s ${ltoplugin} lib/bfd-plugins/${ltoplugin##*/}
+		fi
 		touch "${tagFileBase}_built"
 		cd "${top}"
 		if [ "${keepBuildFolders}" = "n" ]; then
